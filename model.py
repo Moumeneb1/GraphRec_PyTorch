@@ -159,19 +159,26 @@ class GraphRec(nn.Module):
         self.num_items = num_items
         self.num_rate_levels = num_rate_levels
         self.emb_dim = emb_dim
+
+
+
         self.user_emb = nn.Embedding(self.num_users, self.emb_dim, padding_idx = 0)
         self.item_emb = nn.Embedding(self.num_items, self.emb_dim, padding_idx = 0)
         self.rate_emb = nn.Embedding(self.num_rate_levels, self.emb_dim, padding_idx = 0)
-
+        
         self.user_model = _UserModel(self.emb_dim, self.user_emb, self.item_emb, self.rate_emb)
 
         self.item_model = _ItemModel(self.emb_dim, self.user_emb, self.item_emb, self.rate_emb)
         
         self.rate_pred = nn.Sequential(
             nn.Linear(2 * self.emb_dim, self.emb_dim, bias = True),
+            nn.BatchNorm1d(self.embed_dim, momentum=0.5),
             nn.ReLU(),
+            nn.Dropout(),
             nn.Linear(self.emb_dim, self.emb_dim, bias = True),
+            nn.BatchNorm1d(self.embed_dim, momentum=0.5),
             nn.ReLU(),
+            nn.Dropout(),
             nn.Linear(self.emb_dim, 1),
         )
 

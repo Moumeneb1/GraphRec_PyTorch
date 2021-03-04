@@ -14,6 +14,8 @@ import numpy as np
 import random
 from tqdm import tqdm
 from os.path import join
+from apex import amp, optimizers
+
 
 import torch
 from torch import nn
@@ -75,6 +77,8 @@ def main():
         return
 
     optimizer = optim.RMSprop(model.parameters(), args.lr)
+    model, optimizer = amp.initialize(model, optimizer, opt_level='O2')
+
     criterion = nn.MSELoss()
     scheduler = StepLR(optimizer, step_size = args.lr_dc_step, gamma = args.lr_dc)
 
@@ -122,8 +126,12 @@ def trainForEpoch(train_loader, model, optimizer, epoch, num_epochs, criterion, 
         outputs = model(uids, iids, u_items, u_users, u_users_items, i_users)
 
         loss = criterion(outputs, labels.unsqueeze(1))
-        loss.backward()
-        optimizer.step() 
+        #loss.backward()
+        #optimizer.step() 
+
+        with amp.scale_loss(loss, optimizer) as scaled_loss:
+            scaled_loss.backward()
+        optimizer.step()
 
         loss_val = loss.item()
         sum_epoch_loss += loss_val
