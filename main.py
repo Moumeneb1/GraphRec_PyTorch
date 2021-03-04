@@ -82,12 +82,17 @@ def main():
     criterion = nn.MSELoss()
     scheduler = StepLR(optimizer, step_size = args.lr_dc_step, gamma = args.lr_dc)
 
+    best_rmse = 9999.0
+    best_mae = 9999.0
+    endure_count = 0
+
     for epoch in tqdm(range(args.epoch)):
         # train for one epoch
         scheduler.step(epoch = epoch)
         trainForEpoch(train_loader, model, optimizer, epoch, args.epoch, criterion, log_aggr = 100)
 
         mae, rmse = validate(valid_loader, model)
+
 
         # store best loss and save a model checkpoint
         ckpt_dict = {
@@ -98,13 +103,25 @@ def main():
 
         torch.save(ckpt_dict, 'latest_checkpoint.pth.tar')
 
-        if epoch == 0:
+        if best_rmse > rmse:
+            best_rmse = rmse
+            best_mae = mae
+            endure_count = 0
+            torch.save(ckpt_dict, 'best_checkpoint.pth.tar')
+        else:
+            endure_count += 1
+        
+        print('Epoch {} validation: MAE: {:.4f}, RMSE: {:.4f}, Best MAE: {:.4f}'.format(epoch, mae, rmse, best_rmse))
+        
+        if endure_count > 5:
+            break
+        
+        '''if epoch == 0:
             best_mae = mae
         elif mae < best_mae:
             best_mae = mae
-            torch.save(ckpt_dict, 'best_checkpoint.pth.tar')
+            torch.save(ckpt_dict, 'best_checkpoint.pth.tar')'''
 
-        print('Epoch {} validation: MAE: {:.4f}, RMSE: {:.4f}, Best MAE: {:.4f}'.format(epoch, mae, rmse, best_mae))
 
 
 def trainForEpoch(train_loader, model, optimizer, epoch, num_epochs, criterion, log_aggr=1):
