@@ -172,11 +172,11 @@ class GraphRec(nn.Module):
         
         self.rate_pred = nn.Sequential(
             nn.Linear(2 * self.emb_dim, self.emb_dim, bias = True),
-            nn.BatchNorm1d(self.embed_dim, momentum=0.5),
+            nn.BatchNorm1d(self.emb_dim, momentum=0.5),
             nn.ReLU(),
             nn.Dropout(),
             nn.Linear(self.emb_dim, self.emb_dim, bias = True),
-            nn.BatchNorm1d(self.embed_dim, momentum=0.5),
+            nn.BatchNorm1d(self.emb_dim, momentum=0.5),
             nn.ReLU(),
             nn.Dropout(),
             nn.Linear(self.emb_dim, 1),
