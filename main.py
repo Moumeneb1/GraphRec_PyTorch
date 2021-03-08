@@ -91,6 +91,7 @@ def main():
         scheduler.step(epoch = epoch)
         trainForEpoch(train_loader, model, optimizer, epoch, args.epoch, criterion, log_aggr = 100)
 
+        
         mae, rmse = validate(valid_loader, model)
 
 
