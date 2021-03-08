@@ -47,7 +47,7 @@ class _UserModel(nn.Module):
         self.aggre_neigbors = _Aggregation(self.emb_dim, self.emb_dim)
         
         self.combine_mlp = nn.Sequential(
-            nn.Linear(2 * self.emb_dim, self.emb_dim, bias = True),
+            nn.Linear(self.emb_dim, self.emb_dim, bias = True),
             nn.ReLU(),
             nn.Linear(self.emb_dim, self.emb_dim, bias = True),
             nn.ReLU(),
@@ -100,7 +100,7 @@ class _UserModel(nn.Module):
         h_iS = self.aggre_neigbors(torch.sum(beta.unsqueeze(2).expand_as(h_oI) * h_oI, 1))     # B x emb_dim
 
         ## learning user latent factor
-        h_i = self.combine_mlp(torch.cat([h_iI, h_iS], dim = 1))
+        h_i = self.combine_mlp(h_iI)
 
         return h_i
 
