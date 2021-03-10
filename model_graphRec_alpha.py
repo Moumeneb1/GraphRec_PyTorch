@@ -74,6 +74,7 @@ class _UserModel(nn.Module):
         alpha = torch.exp(alpha) * mask_u
         alpha = alpha / (torch.sum(alpha, 1).unsqueeze(1).expand_as(alpha) + self.eps)
 
+        print(torch.sum(mask_u))
         h_iI = self.aggre_items(torch.sum(alpha.unsqueeze(2).expand_as(x_ia) * x_ia, 1))     # B x emb_dim
 
         # social aggregation
