@@ -75,7 +75,7 @@ class _UserModel(nn.Module):
         #alpha = alpha / (torch.sum(alpha, 1).unsqueeze(1).expand_as(alpha) + self.eps)
         #print((1/torch.sum(mask_u,1).unsqueeze(1).expand_as(mask_u))*mask_u)
         #mean attention
-        alpha = 1/torch.sum(mask_u,1).unsqueeze(1).expand_as(mask_u))*mask_u
+        alpha = (1/torch.sum(mask_u,1).unsqueeze(1).expand_as(mask_u))*mask_u
         #print(torch.sum(mask_u))
         h_iI = self.aggre_items(torch.sum(alpha.unsqueeze(2).expand_as(x_ia) * x_ia, 1))     # B x emb_dim
 
