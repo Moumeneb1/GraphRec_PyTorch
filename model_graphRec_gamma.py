@@ -141,7 +141,7 @@ class _ItemModel(nn.Module):
         
 
         #miu = (1/torch.sum(mask_i,1).unsqueeze(1).expand_as(mask_i))*mask_i
-        z_j = self.aggre_users(torch.mean(miu.unsqueeze(2).expand_as(f_jt) * f_jt,1))
+        z_j = self.aggre_users(torch.mean(mask_i.unsqueeze(2).expand_as(f_jt) * f_jt,1))
 
         return z_j
 
