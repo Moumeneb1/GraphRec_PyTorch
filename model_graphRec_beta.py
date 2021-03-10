@@ -97,9 +97,10 @@ class _UserModel(nn.Module):
         ## calculate attention scores in social aggregation
         beta = self.user_users_att(torch.cat([h_oI, self.user_emb(u_user_pad)], dim = 2).view(-1, 2 * self.emb_dim)).view(u_user_pad.size())
         mask_su = torch.where(u_user_pad > 0, torch.tensor([1.], device=self.device), torch.tensor([0.], device=self.device))
-        beta = torch.exp(beta) * mask_su
-        beta = beta / (torch.sum(beta, 1).unsqueeze(1).expand_as(beta) + self.eps)
-        h_iS = self.aggre_neigbors(torch.sum(beta.unsqueeze(2).expand_as(h_oI) * h_oI, 1))     # B x emb_dim
+        #beta = torch.exp(beta) * mask_su
+        #beta = beta / (torch.sum(beta, 1).unsqueeze(1).expand_as(beta) + self.eps)
+
+        h_iS = self.aggre_neigbors(torch.mean(mask_su.unsqueeze(2).expand_as(h_oI) * h_oI,1))     # B x emb_dim
 
         ## learning user latent factor
         h_i = self.combine_mlp(torch.cat([h_iI, h_iS], dim = 1))
