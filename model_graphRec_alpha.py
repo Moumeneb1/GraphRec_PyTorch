@@ -70,11 +70,12 @@ class _UserModel(nn.Module):
         ## calculate attention scores in item aggregation 
         p_i = mask_u.unsqueeze(2).expand_as(x_ia) * self.user_emb(uids).unsqueeze(1).expand_as(x_ia)  # B x maxi_len x emb_dim
         
-        alpha = self.user_items_att(torch.cat([x_ia, p_i], dim = 2).view(-1, 2 * self.emb_dim)).view(mask_u.size()) # B x maxi_len
-        alpha = torch.exp(alpha) * mask_u
-        alpha = alpha / (torch.sum(alpha, 1).unsqueeze(1).expand_as(alpha) + self.eps)
-        print((1/torch.sum(mask_u,1).unsqueeze(1).expand_as(mask_u))*mask_u)
-
+        #alpha = self.user_items_att(torch.cat([x_ia, p_i], dim = 2).view(-1, 2 * self.emb_dim)).view(mask_u.size()) # B x maxi_len
+        #alpha = torch.exp(alpha) * mask_u
+        #alpha = alpha / (torch.sum(alpha, 1).unsqueeze(1).expand_as(alpha) + self.eps)
+        #print((1/torch.sum(mask_u,1).unsqueeze(1).expand_as(mask_u))*mask_u)
+        #mean attention
+        alpha = 1/torch.sum(mask_u,1).unsqueeze(1).expand_as(mask_u))*mask_u
         #print(torch.sum(mask_u))
         h_iI = self.aggre_items(torch.sum(alpha.unsqueeze(2).expand_as(x_ia) * x_ia, 1))     # B x emb_dim
 
