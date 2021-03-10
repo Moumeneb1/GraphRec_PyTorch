@@ -39,6 +39,7 @@ class _UserModel(nn.Module):
         self.emb_dim = emb_dim
 
         self.g_v = _MultiLayerPercep(self.emb_dim, self.emb_dim)
+        self.g_v_s = _MultiLayerPercep(2*self.emb_dim, self.emb_dim)
 
         self.user_items_att = _MultiLayerPercep(2 * self.emb_dim, 1)
         self.aggre_items = _Aggregation(self.emb_dim, self.emb_dim)
@@ -81,7 +82,7 @@ class _UserModel(nn.Module):
         mask_s = torch.where(u_user_item_pad[:,:,:,0] > 0, torch.tensor([1.], device=self.device), torch.tensor([0.], device=self.device))  # B x maxu_len x maxi_len
         u_user_item_er = self.rate_emb(u_user_item_pad[:,:,:,1]) # B x maxu_len x maxi_len x emb_dim
         
-        x_ia_s = self.g_v(torch.cat([q_a_s, u_user_item_er], dim = 3).view(-1, 2 * self.emb_dim)).view(q_a_s.size())  # B x maxu_len x maxi_len x emb_dim   
+        x_ia_s = self.g_v_s(torch.cat([q_a_s, u_user_item_er], dim = 3).view(-1, 2 * self.emb_dim)).view(q_a_s.size())  # B x maxu_len x maxi_len x emb_dim   
 
         p_i_s = mask_s.unsqueeze(3).expand_as(x_ia_s) * self.user_emb(u_user_pad).unsqueeze(2).expand_as(x_ia_s)  # B x maxu_len x maxi_len x emb_dim
 
