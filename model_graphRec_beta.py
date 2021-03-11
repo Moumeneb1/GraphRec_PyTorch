@@ -85,20 +85,19 @@ class _UserModel(nn.Module):
 
         p_i_s = mask_s.unsqueeze(3).expand_as(x_ia_s) * self.user_emb(u_user_pad).unsqueeze(2).expand_as(x_ia_s)  # B x maxu_len x maxi_len x emb_dim
 
-        #alpha_s = self.user_items_att(torch.cat([x_ia_s, p_i_s], dim = 3).view(-1, 2 * self.emb_dim)).view(mask_s.size())    # B x maxu_len x maxi_len
-        #alpha_s = torch.exp(alpha_s) * mask_s
-        #alpha_s = alpha_s / (torch.sum(alpha_s, 2).unsqueeze(2).expand_as(alpha_s) + self.eps)
+        alpha_s = self.user_items_att(torch.cat([x_ia_s, p_i_s], dim = 3).view(-1, 2 * self.emb_dim)).view(mask_s.size())    # B x maxu_len x maxi_len
+        alpha_s = torch.exp(alpha_s) * mask_s
+        alpha_s = alpha_s / (torch.sum(alpha_s, 2).unsqueeze(2).expand_as(alpha_s) + self.eps)
 
-        alpha_s = (1/torch.sum(mask_s,1).unsqueeze(1).expand_as(mask_s))*mask_s
-        
         h_oI_temp = torch.sum(alpha_s.unsqueeze(3).expand_as(x_ia_s) * x_ia_s, 2)    # B x maxu_len x emb_dim
         h_oI = self.aggre_items(h_oI_temp.view(-1, self.emb_dim)).view(h_oI_temp.size())  # B x maxu_len x emb_dim
 
         ## calculate attention scores in social aggregation
-        #beta = self.user_users_att(torch.cat([h_oI, self.user_emb(u_user_pad)], dim = 2).view(-1, 2 * self.emb_dim)).view(u_user_pad.size())
+        beta = self.user_users_att(torch.cat([h_oI, self.user_emb(u_user_pad)], dim = 2).view(-1, 2 * self.emb_dim)).view(u_user_pad.size())
         mask_su = torch.where(u_user_pad > 0, torch.tensor([1.], device=self.device), torch.tensor([0.], device=self.device))
         #beta = torch.exp(beta) * mask_su
         #beta = beta / (torch.sum(beta, 1).unsqueeze(1).expand_as(beta) + self.eps)
+        torch.mean(mask_su.unsqueeze(2).expand_as(h_oI) * h_oI,1)
 
         h_iS = self.aggre_neigbors(torch.mean(mask_su.unsqueeze(2).expand_as(h_oI) * h_oI,1))     # B x emb_dim
 
