@@ -95,7 +95,7 @@ class _UserModel(nn.Module):
         h_oI = self.aggre_items(h_oI_temp.view(-1, self.emb_dim)).view(h_oI_temp.size())  # B x maxu_len x emb_dim
 
         ## calculate attention scores in social aggregation
-        beta = self.user_users_att(torch.cat([h_oI, self.user_emb(u_user_pad)], dim = 2).view(-1, 2 * self.emb_dim)).view(u_user_pad.size())
+        #beta = self.user_users_att(torch.cat([h_oI, self.user_emb(u_user_pad)], dim = 2).view(-1, 2 * self.emb_dim)).view(u_user_pad.size())
         mask_su = torch.where(u_user_pad > 0, torch.tensor([1.], device=self.device), torch.tensor([0.], device=self.device))
         #beta = torch.exp(beta) * mask_su
         #beta = beta / (torch.sum(beta, 1).unsqueeze(1).expand_as(beta) + self.eps)
