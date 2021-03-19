@@ -175,7 +175,6 @@ def trainForEpoch(train_loader, model, optimizer, epoch, num_epochs, criterion, 
                   len(uids) / (time.time() - start)))
 
         start = time.time()
-            start = time.time()
     for name, weight in model.named_parameters():
         writer.add_histogram(name,weight, epoch)
         writer.add_histogram(f'{name}.grad',weight.grad, epoch)
