@@ -31,6 +31,9 @@ from utils import collate_fn
 from model import GraphRec
 from model_graphRec_Opinion import GraphRecOpinion
 from model_graphRec_SN import GraphRecSN
+from model_graphRec_alpha import GraphRecAlpha
+from model_graphRec_beta import GraphRecBeta
+from model_graphRec_gamma import GraphRecGamma
 
 from dataloader import GRDataset
 
@@ -77,6 +80,15 @@ def main():
     if args.model=="GraphRecSN" :
         print("loaded GraphRecSN") 
         model = GraphRecSN(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)
+    elif args.model=="GraphRecAlpha" : 
+        print("loaded GraphRecAlpha")
+        model = GraphRecAlpha(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)
+    elif args.model=="GraphRecGamma" : 
+        print("loaded GraphRecGamma")
+        model = GraphRecGamma(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)
+    elif args.model=="GraphRecBeta" : 
+        print("loaded GraphRecBeta")
+        model = GraphRecBeta(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)   
     elif args.model=="GraphRecOpinion" : 
         print("loaded GraphRecOpinion")
         model = GraphRecOpinion(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)
