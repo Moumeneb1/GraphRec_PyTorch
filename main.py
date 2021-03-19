@@ -74,7 +74,7 @@ def main():
     
 
 
-    elif args.model=="GraphRecSN" :
+    if args.model=="GraphRecSN" :
         print("loaded GraphRecSN") 
         model = GraphRecSN(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)
     elif args.model=="GraphRecOpinion" : 
@@ -83,6 +83,7 @@ def main():
     else : #  args.model=="GraphRec"
         print("loaded GraphRec")
         model = GraphRec(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)
+    
     if args.test:
         print('Load checkpoint and testing...')
         ckpt = torch.load('best_checkpoint.pth.tar')
