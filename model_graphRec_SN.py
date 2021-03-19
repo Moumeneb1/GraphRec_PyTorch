@@ -144,7 +144,7 @@ class _ItemModel(nn.Module):
         return z_j
 
 
-class GraphRec(nn.Module):
+class GraphRecSN(nn.Module):
     '''GraphRec model proposed in the paper Graph neural network for social recommendation 
 
     Args:
@@ -155,7 +155,7 @@ class GraphRec(nn.Module):
 
     '''
     def __init__(self, num_users, num_items, num_rate_levels, emb_dim = 64):
-        super(GraphRec, self).__init__()
+        super(GraphRecSN, self).__init__()
         self.num_users = num_users
         self.num_items = num_items
         self.num_rate_levels = num_rate_levels

@@ -14,7 +14,6 @@ import numpy as np
 import random
 from tqdm import tqdm
 from os.path import join
-from apex import amp, optimizers
 
 
 import torch
@@ -25,12 +24,18 @@ import torch.optim as optim
 from torch.optim.lr_scheduler import StepLR
 from torch.autograd import Variable
 from torch.backends import cudnn
+from torch.utils.tensorboard import SummaryWriter
+
 
 from utils import collate_fn
 from model import GraphRec
+from model_graphRec_Opinion import GraphRecOpinion
+from model_graphRec_SN import GraphRecSN
+
 from dataloader import GRDataset
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--model', default='GraphRec', help='The dataset to try')
 parser.add_argument('--dataset_path', default='dataset/Ciao/', help='dataset directory path: datasets/Ciao/Epinions')
 parser.add_argument('--batch_size', type=int, default=256, help='input batch size')
 parser.add_argument('--embed_dim', type=int, default=64, help='the dimension of embedding')
@@ -65,8 +70,16 @@ def main():
     train_loader = DataLoader(train_data, batch_size = args.batch_size, shuffle = True, collate_fn = collate_fn)
     valid_loader = DataLoader(valid_data, batch_size = args.batch_size, shuffle = False, collate_fn = collate_fn)
     test_loader = DataLoader(test_data, batch_size = args.batch_size, shuffle = False, collate_fn = collate_fn)
+    
 
-    model = GraphRec(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)
+    if arg.model=="GraphRec":
+        model = GraphRec(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)
+    elif arg.model=="GraphRecSN" : 
+        model = GraphRecSN(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)
+    elif arg.model=="GraphRecOpinion" : 
+        model = GraphRecOpinion(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)
+    
+    writer = SummaryWriter()
 
     if args.test:
         print('Load checkpoint and testing...')
@@ -122,7 +135,7 @@ def main():
         elif mae < best_mae:
             best_mae = mae
             torch.save(ckpt_dict, 'best_checkpoint.pth.tar')'''
-
+    writer.close()
 
 
 def trainForEpoch(train_loader, model, optimizer, epoch, num_epochs, criterion, log_aggr=1):
@@ -131,7 +144,7 @@ def trainForEpoch(train_loader, model, optimizer, epoch, num_epochs, criterion, 
     sum_epoch_loss = 0
 
     start = time.time()
-    for i, (uids, iids, labels, u_items, u_users, u_users_items, i_users) in tqdm(enumerate(train_loader), total=len(train_loader)):
+    for i, (uids, iids, labels, u_items, u_users, u_users_items, i_users) in enumerate(train_loader):
         uids = uids.to(device)
         iids = iids.to(device)
         labels = labels.to(device)
@@ -162,13 +175,17 @@ def trainForEpoch(train_loader, model, optimizer, epoch, num_epochs, criterion, 
                   len(uids) / (time.time() - start)))
 
         start = time.time()
+            start = time.time()
+    for name, weight in model.named_parameters():
+        writer.add_histogram(name,weight, epoch)
+        writer.add_histogram(f'{name}.grad',weight.grad, epoch)
 
 
 def validate(valid_loader, model):
     model.eval()
     errors = []
     with torch.no_grad():
-        for uids, iids, labels, u_items, u_users, u_users_items, i_users in tqdm(valid_loader):
+        for uids, iids, labels, u_items, u_users, u_users_items, i_users in valid_loader:
             uids = uids.to(device)
             iids = iids.to(device)
             labels = labels.to(device)
