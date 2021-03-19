@@ -102,7 +102,7 @@ def main():
     for epoch in tqdm(range(args.epoch)):
         # train for one epoch
         scheduler.step(epoch = epoch)
-        trainForEpoch(train_loader, model, optimizer, epoch, args.epoch, criterion, log_aggr = 100,writer)
+        trainForEpoch(train_loader, model, optimizer, epoch, args.epoch, criterion,writer, log_aggr = 100)
 
         
         mae, rmse = validate(valid_loader, model)
@@ -138,7 +138,7 @@ def main():
     writer.close()
 
 
-def trainForEpoch(train_loader, model, optimizer, epoch, num_epochs, criterion, log_aggr=1,writer):
+def trainForEpoch(train_loader, model, optimizer, epoch, num_epochs, criterion, writer,log_aggr=1):
     model.train()
 
     sum_epoch_loss = 0
