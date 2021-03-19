@@ -54,7 +54,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def main():
-    writer = SummaryWriter()
+    writer = SummaryWriter(args.model)
     print('Loading data...')
     with open(args.dataset_path + 'dataset.pkl', 'rb') as f:
         train_set = pickle.load(f)
