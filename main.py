@@ -51,6 +51,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def main():
+    writer = SummaryWriter()
     print('Loading data...')
     with open(args.dataset_path + 'dataset.pkl', 'rb') as f:
         train_set = pickle.load(f)
@@ -79,7 +80,6 @@ def main():
     elif args.model=="GraphRecOpinion" : 
         model = GraphRecOpinion(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)
     
-    writer = SummaryWriter()
 
     if args.test:
         print('Load checkpoint and testing...')
@@ -102,7 +102,7 @@ def main():
     for epoch in tqdm(range(args.epoch)):
         # train for one epoch
         scheduler.step(epoch = epoch)
-        trainForEpoch(train_loader, model, optimizer, epoch, args.epoch, criterion, log_aggr = 100)
+        trainForEpoch(train_loader, model, optimizer, epoch, args.epoch, criterion, log_aggr = 100,writer)
 
         
         mae, rmse = validate(valid_loader, model)
@@ -138,7 +138,7 @@ def main():
     writer.close()
 
 
-def trainForEpoch(train_loader, model, optimizer, epoch, num_epochs, criterion, log_aggr=1):
+def trainForEpoch(train_loader, model, optimizer, epoch, num_epochs, criterion, log_aggr=1,writer):
     model.train()
 
     sum_epoch_loss = 0
