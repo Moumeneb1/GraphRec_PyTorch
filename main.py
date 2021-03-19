@@ -72,11 +72,11 @@ def main():
     test_loader = DataLoader(test_data, batch_size = args.batch_size, shuffle = False, collate_fn = collate_fn)
     
 
-    if arg.model=="GraphRec":
+    if args.model=="GraphRec":
         model = GraphRec(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)
-    elif arg.model=="GraphRecSN" : 
+    elif args.model=="GraphRecSN" : 
         model = GraphRecSN(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)
-    elif arg.model=="GraphRecOpinion" : 
+    elif args.model=="GraphRecOpinion" : 
         model = GraphRecOpinion(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)
     
     writer = SummaryWriter()
