@@ -191,8 +191,11 @@ def trainForEpoch(train_loader, model, optimizer, epoch, num_epochs, criterion, 
 
         start = time.time()
     for name, weight in model.named_parameters():
-        writer.add_histogram(name,weight, epoch)
-        writer.add_histogram(f'{name}.grad',weight.grad, epoch)
+        try :
+            writer.add_histogram(name,weight, epoch)
+            writer.add_histogram(f'{name}.grad',weight.grad, epoch)
+        except:
+            pass
 
 
 def validate(valid_loader, model):
