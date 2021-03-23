@@ -6,7 +6,7 @@ class _MultiLayerPercep(nn.Module):
         super(_MultiLayerPercep, self).__init__()
         self.mlp = nn.Sequential(
             nn.Linear(input_dim, input_dim // 2, bias=True),
-            nn.LeakyReLU(),
+            nn.PReLU(),
             nn.Dropout(),            
             nn.Linear(input_dim // 2, output_dim, bias=True),
         )
@@ -20,7 +20,7 @@ class _Aggregation(nn.Module):
         super(_Aggregation, self).__init__()
         self.aggre = nn.Sequential(
             nn.Linear(input_dim, output_dim, bias=True),
-            nn.LeakyReLU(),
+            nn.PReLU(),
         )
 
     def forward(self, x):
@@ -48,11 +48,11 @@ class _UserModel(nn.Module):
         
         self.combine_mlp = nn.Sequential(
             nn.Linear(2 * self.emb_dim, self.emb_dim, bias = True),
-            nn.LeakyReLU(),
+            nn.PReLU(),
             nn.Linear(self.emb_dim, self.emb_dim, bias = True),
-            nn.LeakyReLU(),
+            nn.PReLU(),
             nn.Linear(self.emb_dim, self.emb_dim, bias = True),
-            nn.LeakyReLU(),
+            nn.PReLU(),
         )
 
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -174,11 +174,11 @@ class GraphRec(nn.Module):
         self.rate_pred = nn.Sequential(
             nn.Linear(2 * self.emb_dim, self.emb_dim, bias = True),
             nn.BatchNorm1d(self.emb_dim, momentum=0.5),
-            nn.LeakyReLU(),
+            nn.PReLU(),
             nn.Dropout(),
             nn.Linear(self.emb_dim, self.emb_dim, bias = True),
             nn.BatchNorm1d(self.emb_dim, momentum=0.5),
-            nn.LeakyReLU(),
+            nn.PReLU(),
             nn.Dropout(),
             nn.Linear(self.emb_dim, 1),
         )
