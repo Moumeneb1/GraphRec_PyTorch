@@ -34,6 +34,7 @@ from model_graphRec_SN import GraphRecSN
 from model_graphRec_alpha import GraphRecAlpha
 from model_graphRec_beta import GraphRecBeta
 from model_graphRec_gamma import GraphRecGamma
+from model_graphRec_alpha_beta import GraphRecAlphaBeta
 
 from dataloader import GRDataset
 
@@ -89,6 +90,9 @@ def main():
     elif args.model=="GraphRecBeta" : 
         print("loaded GraphRecBeta")
         model = GraphRecBeta(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)   
+    elif args.model=="GraphRecAlphaBeta" : 
+        print("loaded GraphRecBeta")
+        model = GraphRecAlphaBeta(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)   
     elif args.model=="GraphRecOpinion" : 
         print("loaded GraphRecOpinion")
         model = GraphRecOpinion(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)
