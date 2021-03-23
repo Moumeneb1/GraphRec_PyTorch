@@ -124,6 +124,7 @@ def main():
 
         #calculate validation loss 
         model.eval()
+        loss_sum = 0
         with torch.no_grad():
             for b_size, (uids, iids, labels, u_items, u_users, u_users_items, i_users) in enumerate(valid_loader):
                 uids = uids.to(device)
