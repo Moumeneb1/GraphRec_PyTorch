@@ -118,10 +118,39 @@ def main():
     best_mae = 9999.0
     endure_count = 0
 
+
+
+    relu_layers = {
+        "gv_relu":  model.user_model.g_v.mlp[1], # gv_relu
+        "user_items_att_relu": model.user_model.user_items_att.mlp[1], # user item attention relu
+        "aggre_items_relu": model.user_model.aggre_items.aggre[1], # aggre_items relu
+        "user_users_att_relu" : model.user_model.user_users_att.mlp[1],
+        "aggre_neigbors_relu" : model.user_model.aggre_neigbors.aggre[1], # aggre_items relu
+        "combine_mlp_relu_1_relu" : model.user_model.combine_mlp[1], # combinre relu 1
+        "combine_mlp_relu_3_relu" : model.user_model.combine_mlp[3], # combinre relu 2
+        "combine_mlp_relu_5_relu" : model.user_model.combine_mlp[5], # combinre relu 3
+        "gu_relu" : model.item_model.g_u.mlp[1],
+        "item_users_att_relu" : model.item_model.item_users_att.mlp[1],
+        "aggre_users_relu  " : model.item_model.aggre_users.aggre[1],
+        "rate_pred_1" : model.rate_pred[1],
+        "rate_pred_3" : model.rate_pred[3],
+
+    }
+
+    activation = {}
+    def get_activation(name):
+        def hook(model, input, output):
+            activation[name] = output.detach()
+        return hook
+    
+    
+    for k,v in relu_layers.items():
+      v.register_forward_hook(get_activation(k))
+
     for epoch in tqdm(range(args.epoch)):
         # train for one epoch
         scheduler.step(epoch = epoch)
-        trainForEpoch(train_loader, model, optimizer, epoch, args.epoch, criterion,writer, log_aggr = 100)
+        trainForEpoch(train_loader, model, optimizer, epoch, args.epoch, criterion,writer, relu_layers, activation, log_aggr = 100)
 
         
         mae, rmse = validate(valid_loader, model)
@@ -157,7 +186,7 @@ def main():
     writer.close()
 
 
-def trainForEpoch(train_loader, model, optimizer, epoch, num_epochs, criterion, writer,log_aggr=1):
+def trainForEpoch(train_loader, model, optimizer, epoch, num_epochs, criterion, writer,relu_layers, activation, log_aggr=1):
     model.train()
 
     sum_epoch_loss = 0
@@ -194,6 +223,9 @@ def trainForEpoch(train_loader, model, optimizer, epoch, num_epochs, criterion, 
                   len(uids) / (time.time() - start)))
 
         start = time.time()
+
+    for k,v in relu_layers.items():
+        writer.add_histogram(k,activation[k], epoch)
     for name, weight in model.named_parameters():
         try :
             writer.add_histogram(name,weight, epoch)
