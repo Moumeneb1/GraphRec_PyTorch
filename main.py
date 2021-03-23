@@ -138,7 +138,7 @@ def main():
                 loss_sum += loss.item()
 
 
-        writer.add_scalar('Loss/train', loss_sum/, epoch)
+        writer.add_scalar('Loss/train', loss_sum/b_size, epoch)
         writer.add_scalar('RMSE/valid', rmse, epoch)
         writer.add_scalar('MAE/valid', mae, epoch)
         # store best loss and save a model checkpoint
