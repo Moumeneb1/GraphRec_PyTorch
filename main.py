@@ -119,10 +119,28 @@ def main():
         scheduler.step(epoch = epoch)
         trainForEpoch(train_loader, model, optimizer, epoch, args.epoch, criterion,writer, log_aggr = 100)
 
-        
+
         mae, rmse = validate(valid_loader, model)
 
+        #calculate validation loss 
+        model.eval()
+        with torch.no_grad():
+            for b_size, uids, iids, labels, u_items, u_users, u_users_items, i_users in enumerate(valid_loader):
+                uids = uids.to(device)
+                iids = iids.to(device)
+                labels = labels.to(device)
+                u_items = u_items.to(device)
+                u_users = u_users.to(device)
+                u_users_items = u_users_items.to(device)
+                i_users = i_users.to(device)
+                preds = model(uids, iids, u_items, u_users, u_users_items, i_users)
+                loss = criterion(preds, labels.unsqueeze(1))
+                loss_sum += loss.item()
 
+
+        writer.add_scalar('Loss/train', loss_sum/, epoch)
+        writer.add_scalar('RMSE/valid', rmse, epoch)
+        writer.add_scalar('MAE/valid', mae, epoch)
         # store best loss and save a model checkpoint
         ckpt_dict = {
             'epoch': epoch + 1,
@@ -196,6 +214,11 @@ def trainForEpoch(train_loader, model, optimizer, epoch, num_epochs, criterion, 
             writer.add_histogram(f'{name}.grad',weight.grad, epoch)
         except:
             pass
+    train_mae, train_rmse = validate(train_loader, model)
+    writer.add_scalar('Loss/train', loss, epoch)
+    writer.add_scalar('RMSE/train', train_rmse, epoch)
+    writer.add_scalar('MAE/train', train_mae, epoch)
+
 
 
 def validate(valid_loader, model):
@@ -216,7 +239,7 @@ def validate(valid_loader, model):
     
     mae = np.mean(errors)
     rmse = np.sqrt(np.mean(np.power(errors, 2)))
-    return mae, rmse
+    return mae, rmse 
 
 
 if __name__ == '__main__':
