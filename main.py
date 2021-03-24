@@ -35,6 +35,7 @@ from model_graphRec_alpha import GraphRecAlpha
 from model_graphRec_beta import GraphRecBeta
 from model_graphRec_gamma import GraphRecGamma
 from model_graphRec_alpha_beta import GraphRecAlphaBeta
+from model_graphRec_NoBatchNorm import GraphRecNoBatchNorm
 
 from dataloader import GRDataset
 
@@ -81,6 +82,9 @@ def main():
     if args.model=="GraphRecSN" :
         print("loaded GraphRecSN") 
         model = GraphRecSN(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)
+    elif args.model =="GraphRecNoBatchNorm" : 
+        print("loaded GraphRecNoBatchNorm")
+        model = GraphRecNoBatchNorm(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)
     elif args.model=="GraphRecAlpha" : 
         print("loaded GraphRecAlpha")
         model = GraphRecAlpha(user_count+1, item_count+1, rate_count+1, args.embed_dim).to(device)
